@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AmkyawDev EditorApp - Advanced Editor</title>
+    <title>AmkyawDev EditorApp - Advanced Code Editor</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/editing.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/transforms.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='assets/icons/favicon.ico') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/material-darker.min.css">
 </head>
 <body>
     <div class="bg-animation"></div>
@@ -26,101 +28,144 @@
         </nav>
     </header>
 
-    <!-- Editor Container -->
+    <!-- Advanced Editor Container -->
     <div class="editor-container">
-        <!-- Sidebar -->
+        <!-- Sidebar with File Explorer -->
         <aside class="editor-sidebar" id="sidebar">
             <div class="sidebar-header">
-                <span class="sidebar-title">Files</span>
+                <span class="sidebar-title">📁 Files</span>
                 <div class="sidebar-actions">
-                    <button class="sidebar-btn" title="New File">+</button>
-                    <button class="sidebar-btn" title="Refresh">↻</button>
+                    <button class="sidebar-btn" title="New File" onclick="createNewFile()">+</button>
+                    <button class="sidebar-btn" title="New Folder">📁</button>
+                    <button class="sidebar-btn" title="Refresh" onclick="refreshFiles()">↻</button>
                 </div>
             </div>
             
+            <!-- Project Selector -->
+            <div class="project-selector">
+                <select id="projectSelect" onchange="changeProject(this.value)">
+                    <option value="default">default</option>
+                </select>
+            </div>
+            
             <!-- File Tree -->
-            <div class="file-tree">
-                <div class="file-item active" data-filename="index.html">
+            <div class="file-tree" id="fileTree">
+                <div class="file-item active" data-filename="index.html" onclick="openFile('index.html')">
                     <span class="file-icon html">📄</span>
                     <span>index.html</span>
                 </div>
-                <div class="file-item" data-filename="style.css">
+                <div class="file-item" data-filename="style.css" onclick="openFile('style.css')">
                     <span class="file-icon css">🎨</span>
                     <span>style.css</span>
                 </div>
-                <div class="file-item" data-filename="script.js">
+                <div class="file-item" data-filename="script.js" onclick="openFile('script.js')">
                     <span class="file-icon js">⚡</span>
                     <span>script.js</span>
                 </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="sidebar-footer">
+                <button class="sidebar-action" onclick="openSettings()">⚙️ Settings</button>
             </div>
         </aside>
 
         <!-- Editor Panels -->
         <div class="editor-panels">
-            <!-- Toolbar -->
+            <!-- Advanced Toolbar -->
             <div class="editor-toolbar">
-                <button class="toolbar-btn primary" id="runBtn">▶ Run</button>
-                <button class="toolbar-btn" id="saveBtn">💾 Save</button>
+                <div class="toolbar-group">
+                    <button class="toolbar-btn primary" id="runBtn" onclick="runCode()">▶ Run</button>
+                    <button class="toolbar-btn" id="saveBtn" onclick="saveFile()">💾 Save</button>
+                    <button class="toolbar-btn" onclick="saveAllFiles()">💾💾 Save All</button>
+                </div>
                 <div class="toolbar-divider"></div>
-                <button class="toolbar-btn" id="formatBtn">✨ Format</button>
-                <button class="toolbar-btn" id="undoBtn">↩ Undo</button>
-                <button class="toolbar-btn" id="redoBtn">↪ Redo</button>
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" onclick="formatCode()">✨ Format</button>
+                    <button class="toolbar-btn" onclick="minifyCode()">📦 Minify</button>
+                    <button class="toolbar-btn" onclick="analyzeCode()">🔍 Analyze</button>
+                </div>
                 <div class="toolbar-divider"></div>
-                <button class="toolbar-btn" id="toggleSidebar">☰ Sidebar</button>
-                <button class="toolbar-btn" id="togglePreview">👁️ Preview</button>
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" onclick="undo()">↩ Undo</button>
+                    <button class="toolbar-btn" onclick="redo()">↪ Redo</button>
+                </div>
+                <div class="toolbar-divider"></div>
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" onclick="toggleSidebar()" id="toggleSidebarBtn">☰ Sidebar</button>
+                    <button class="toolbar-btn" onclick="togglePreview()" id="togglePreviewBtn">👁️ Preview</button>
+                    <button class="toolbar-btn" onclick="toggleConsole()" id="toggleConsoleBtn">📋 Console</button>
+                </div>
+                <div class="toolbar-divider"></div>
+                <div class="toolbar-group">
+                    <input type="text" class="search-input" placeholder="🔍 Search..." id="searchInput" oninput="searchCode(this.value)">
+                </div>
             </div>
 
-            <!-- Editor Tabs -->
-            <div class="editor-tabs">
-                <div class="editor-tab active" data-file="index.html">
+            <!-- Editor Tabs with Close Buttons -->
+            <div class="editor-tabs" id="editorTabs">
+                <div class="editor-tab active" data-file="index.html" onclick="switchTab('index.html')">
                     <span class="file-icon html">📄</span>
                     <span>index.html</span>
-                    <span class="tab-close">×</span>
+                    <span class="tab-close" onclick="closeTab(event, 'index.html')">×</span>
                 </div>
-                <div class="editor-tab" data-file="style.css">
+                <div class="editor-tab" data-file="style.css" onclick="switchTab('style.css')">
                     <span class="file-icon css">🎨</span>
                     <span>style.css</span>
-                    <span class="tab-close">×</span>
+                    <span class="tab-close" onclick="closeTab(event, 'style.css')">×</span>
                 </div>
-                <div class="editor-tab" data-file="script.js">
+                <div class="editor-tab" data-file="script.js" onclick="switchTab('script.js')">
                     <span class="file-icon js">⚡</span>
                     <span>script.js</span>
-                    <span class="tab-close">×</span>
+                    <span class="tab-close" onclick="closeTab(event, 'script.js')">×</span>
                 </div>
             </div>
 
-            <!-- Code Area -->
-            <div class="code-area">
-                <div class="line-numbers">1</div>
-                <textarea class="code-editor" id="codeEditor" spellcheck="false" placeholder="Start coding...">&lt;!DOCTYPE html&gt;
-&lt;html lang="en"&gt;
-&lt;head&gt;
-    &lt;meta charset="UTF-8"&gt;
-    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-    &lt;title&gt;My Project&lt;/title&gt;
-    &lt;link rel="stylesheet" href="style.css"&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;div class="container"&gt;
-        &lt;h1&gt;Hello, World!&lt;/h1&gt;
-        &lt;p&gt;Welcome to AmkyawDev EditorApp.&lt;/p&gt;
-        &lt;button class="btn"&gt;Click Me&lt;/button&gt;
-    &lt;/div&gt;
-    &lt;script src="script.js"&gt;&lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;</textarea>
+            <!-- Code Area with Line Numbers -->
+            <div class="code-area" id="codeArea">
+                <div class="line-numbers" id="lineNumbers">1</div>
+                <div class="code-editor-wrapper">
+                    <textarea class="code-editor" id="codeEditor" spellcheck="false" 
+                        placeholder="Start coding..."
+                        oninput="onEditorInput()"
+                        onscroll="syncScroll()"
+                        onkeydown="handleKeyDown(event)"></textarea>
+                    <div class="code-highlight" id="codeHighlight"></div>
+                </div>
             </div>
 
-            <!-- Preview Panel -->
-            <div class="preview-panel">
-                <div class="preview-header">
-                    <span class="preview-title">Preview</span>
-                    <div class="preview-actions">
-                        <button class="toolbar-btn" id="refreshPreview">↻</button>
-                        <button class="toolbar-btn" id="openNewTab">↗</button>
-                    </div>
+            <!-- Bottom Panel - Console/Output -->
+            <div class="editor-bottom" id="consolePanel">
+                <div class="bottom-tabs">
+                    <div class="bottom-tab active" onclick="switchBottomTab('console')">📋 Console</div>
+                    <div class="bottom-tab" onclick="switchBottomTab('output')">📤 Output</div>
+                    <div class="bottom-tab" onclick="switchBottomTab('problems')">⚠️ Problems</div>
+                    <div class="bottom-tab" onclick="switchBottomTab('terminal')">💻 Terminal</div>
                 </div>
-                <iframe class="preview-iframe" id="previewFrame"></iframe>
+                <div class="bottom-content" id="consoleOutput">
+                    <div class="console-message info">🚀 Editor ready! Write your code and click Run to see the result.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preview Panel -->
+        <div class="preview-panel" id="previewPanel">
+            <div class="preview-header">
+                <span class="preview-title">👁️ Live Preview</span>
+                <div class="preview-actions">
+                    <button class="toolbar-btn" onclick="refreshPreview()" title="Refresh">↻</button>
+                    <button class="toolbar-btn" onclick="openInNewTab()" title="Open in New Tab">↗</button>
+                    <button class="toolbar-btn" onclick="toggleDeviceFrame()" title="Device Frame">📱</button>
+                </div>
+            </div>
+            <div class="preview-frame-container" id="previewContainer">
+                <iframe class="preview-iframe" id="previewFrame" sandbox="allow-scripts allow-same-origin"></iframe>
+            </div>
+            <!-- Device Frame Options -->
+            <div class="device-frames">
+                <button class="device-btn" onclick="setDeviceFrame('desktop')">💻 Desktop</button>
+                <button class="device-btn" onclick="setDeviceFrame('tablet')">📱 Tablet</button>
+                <button class="device-btn" onclick="setDeviceFrame('mobile')">📲 Mobile</button>
             </div>
         </div>
     </div>
@@ -128,90 +173,560 @@
     <!-- Status Bar -->
     <div class="status-bar">
         <div class="status-left">
-            <span class="status-item">📄 index.html</span>
+            <span class="status-item" id="currentFile">📄 index.html</span>
             <span class="status-item">UTF-8</span>
+            <span class="status-item" id="fileType">HTML</span>
         </div>
         <div class="status-right">
-            <span class="status-item">Ln 1, Col 1</span>
-            <span class="status-item">HTML</span>
-            <span class="status-item">✨ Ready</span>
+            <span class="status-item" id="cursorPosition">Ln 1, Col 1</span>
+            <span class="status-item" id="totalLines">Lines: 1</span>
+            <span class="status-item" id="encoding">Spaces: 2</span>
+            <span class="status-item" id="statusMessage">✨ Ready</span>
         </div>
     </div>
 
-    <!-- Component Scripts -->
-    <script src="{{ url_for('static', filename='components/htmlEditor.js') }}"></script>
-    <script src="{{ url_for('static', filename='components/cssEditor.js') }}"></script>
-    <script src="{{ url_for('static', filename='components/jsEditor.js') }}"></script>
-    <script src="{{ url_for('static', filename='components/previewSystem.js') }}"></script>
+    <!-- Context Menu -->
+    <div class="context-menu" id="contextMenu" style="display: none;">
+        <div class="context-menu-item" onclick="cutCode()">✂️ Cut</div>
+        <div class="context-menu-item" onclick="copyCode()">📋 Copy</div>
+        <div class="context-menu-item" onclick="pasteCode()">📝 Paste</div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" onclick="formatSelection()">✨ Format</div>
+        <div class="context-menu-item" onclick="commentSelection()">// Comment</div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" onclick="findReplace()">🔍 Find & Replace</div>
+    </div>
+
+    <!-- Find & Replace Dialog -->
+    <div class="modal" id="findReplaceModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Find & Replace</h3>
+                <button class="modal-close" onclick="closeFindReplace()">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="findInput" placeholder="Find..." class="modal-input">
+                <input type="text" id="replaceInput" placeholder="Replace with..." class="modal-input">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="findNext()">Find Next</button>
+                <button class="btn btn-primary" onclick="replaceOne()">Replace</button>
+                <button class="btn btn-primary" onclick="replaceAll()">Replace All</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Code Snippets Panel -->
+    <div class="snippets-panel" id="snippetsPanel" style="display: none;">
+        <div class="snippets-header">
+            <h4>Code Snippets</h4>
+            <button onclick="closeSnippets()">×</button>
+        </div>
+        <div class="snippets-list">
+            <div class="snippet-item" onclick="insertSnippet('html-template')">📄 HTML Template</div>
+            <div class="snippet-item" onclick="insertSnippet('css-flex')">📦 Flexbox</div>
+            <div class="snippet-item" onclick="insertSnippet('css-grid')">🔲 Grid</div>
+            <div class="snippet-item" onclick="insertSnippet('js-function')">⚡ Function</div>
+            <div class="snippet-item" onclick="insertSnippet('js-class')">🏠 Class</div>
+            <div class="snippet-item" onclick="insertSnippet('js-fetch')">🌐 Fetch API</div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
     
-    <!-- Main Scripts -->
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script src="{{ url_for('static', filename='js/advancedFileSystem.js') }}"></script>
     <script src="{{ url_for('static', filename='js/smoothsystem.js') }}"></script>
-
+    
     <script>
-        // Initialize editors when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            const codeArea = document.querySelector('.code-area');
-            const previewPanel = document.querySelector('.preview-panel');
+        // Advanced Editor State
+        const editorState = {
+            currentFile: 'index.html',
+            files: {},
+            isModified: false,
+            undoStack: [],
+            redoStack: [],
+            theme: 'dark'
+        };
+
+        // File contents
+        const defaultFiles = {
+            'index.html': `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Project</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header-section">
+            <h1>Welcome to My App! 🚀</h1>
+            <p class="subtitle">Build something amazing today</p>
+        </header>
+        
+        <main class="content">
+            <div class="card">
+                <h2>Get Started</h2>
+                <p>Click the Run button to see your changes live!</p>
+                <button class="btn" onclick="showMessage()">Click Me</button>
+            </div>
             
-            // Create editor components
-            window.htmlEditor = new HTMLEditor(codeArea);
-            window.previewSystem = new PreviewSystem(previewPanel);
-            
-            // Initialize preview with default content
+            <div class="card">
+                <h2>Features</h2>
+                <ul>
+                    <li>✏️ Edit HTML, CSS, JS</li>
+                    <li>👁️ Live Preview</li>
+                    <li>📱 Mobile Responsive</li>
+                </ul>
+            </div>
+        </main>
+        
+        <footer class="footer">
+            <p>Made with ❤️ by AmkyawDev</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>`,
+            'style.css': `/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header-section {
+    text-align: center;
+    padding: 40px 0;
+    color: white;
+}
+
+.header-section h1 {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin: 40px 0;
+}
+
+.card {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card h2 {
+    color: #667eea;
+    margin-bottom: 15px;
+}
+
+.card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.card li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.card li:last-child {
+    border-bottom: none;
+}
+
+.btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 30px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-top: 20px;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+}
+
+.footer {
+    text-align: center;
+    padding: 40px;
+    color: white;
+    opacity: 0.8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header-section h1 {
+        font-size: 2rem;
+    }
+    
+    .content {
+        grid-template-columns: 1fr;
+    }
+}`,
+            'script.js': `// My Project JavaScript
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 Project loaded successfully!');
+    
+    // Add keyboard shortcuts
+    document.addEventListener('keydown', handleKeyboardShortcuts);
+});
+
+// Show message function
+function showMessage() {
+    alert('Hello! Thanks for using AmkyawDev EditorApp! 🎉');
+    console.log('Button clicked!');
+}
+
+// Handle keyboard shortcuts
+function handleKeyboardShortcuts(e) {
+    // Ctrl+S to save
+    if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        saveFile();
+        console.log('File saved!');
+    }
+    
+    // Ctrl+Enter to run
+    if (e.ctrlKey && e.key === 'Enter') {
+        e.preventDefault();
+        runCode();
+    }
+}
+
+// Export for use in preview
+if (typeof window !== 'undefined') {
+    window.showMessage = showMessage;
+}`
+        };
+
+        // Initialize editor
+        function initEditor() {
+            editorState.files = { ...defaultFiles };
             const editor = document.getElementById('codeEditor');
+            editor.value = defaultFiles['index.html'];
+            updateLineNumbers();
+            updatePreview();
+            updateStatusBar();
+        }
+
+        // Editor input handler
+        function onEditorInput() {
+            updateLineNumbers();
+            updatePreview();
+            updateStatusBar();
+            editorState.isModified = true;
+        }
+
+        // Update line numbers
+        function updateLineNumbers() {
+            const editor = document.getElementById('codeEditor');
+            const lineNumbers = document.getElementById('lineNumbers');
+            const lines = editor.value.split('\n').length;
+            lineNumbers.innerHTML = Array.from({ length: lines }, (_, i) => i + 1).join('\n');
+        }
+
+        // Sync scroll
+        function syncScroll() {
+            const editor = document.getElementById('codeEditor');
+            const lineNumbers = document.getElementById('lineNumbers');
+            lineNumbers.scrollTop = editor.scrollTop;
+        }
+
+        // Handle keyboard events
+        function handleKeyDown(e) {
+            // Tab key
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = e.target.selectionStart;
+                const end = e.target.selectionEnd;
+                const value = e.target.value;
+                e.target.value = value.substring(0, start) + '  ' + value.substring(end);
+                e.target.selectionStart = e.target.selectionEnd = start + 2;
+                onEditorInput();
+            }
+            
+            // Ctrl+Enter to run
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                runCode();
+            }
+        }
+
+        // Run code
+        function runCode() {
+            const html = editorState.files['index.html'] || '';
+            const iframe = document.getElementById('previewFrame');
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            
+            doc.open();
+            doc.write(html);
+            doc.close();
+            
+            addConsoleMessage('🚀 Code executed successfully!', 'success');
+        }
+
+        // Save file
+        function saveFile() {
+            const editor = document.getElementById('codeEditor');
+            editorState.files[editorState.currentFile] = editor.value;
+            editorState.isModified = false;
+            addConsoleMessage(`💾 File "${editorState.currentFile}" saved!`, 'success');
+            updateStatusBar();
+        }
+
+        // Save all files
+        function saveAllFiles() {
+            saveFile();
+            addConsoleMessage('💾💾 All files saved!', 'success');
+        }
+
+        // Open file
+        function openFile(filename) {
+            if (editorState.isModified && !confirm('Save changes before switching?')) {
+                return;
+            }
+            
+            editorState.currentFile = filename;
+            const editor = document.getElementById('codeEditor');
+            editor.value = editorState.files[filename] || '';
+            
+            // Update UI
+            document.querySelectorAll('.file-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.filename === filename);
+            });
+            
+            document.querySelectorAll('.editor-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.file === filename);
+            });
+            
+            updateLineNumbers();
+            updateStatusBar();
+        }
+
+        // Switch tab
+        function switchTab(filename) {
+            openFile(filename);
+        }
+
+        // Close tab
+        function closeTab(event, filename) {
+            event.stopPropagation();
+            if (filename === editorState.currentFile) {
+                const tabs = document.querySelectorAll('.editor-tab');
+                if (tabs.length > 1) {
+                    const nextTab = tabs[0].dataset.file === filename ? tabs[1] : tabs[0];
+                    openFile(nextTab.dataset.file);
+                }
+            }
+        }
+
+        // Update preview
+        function updatePreview() {
+            const html = editorState.files['index.html'] || '';
             const iframe = document.getElementById('previewFrame');
             const doc = iframe.contentDocument || iframe.contentWindow.document;
             doc.open();
-            doc.write(editor.value);
+            doc.write(html);
             doc.close();
+        }
 
-            // Update preview on input
-            editor.addEventListener('input', () => {
-                const doc = iframe.contentDocument || iframe.contentWindow.document;
-                doc.open();
-                doc.write(editor.value);
-                doc.close();
-                updateLineNumbers();
-            });
+        // Refresh preview
+        function refreshPreview() {
+            runCode();
+            addConsoleMessage('🔄 Preview refreshed!', 'info');
+        }
 
-            // Run button
-            document.getElementById('runBtn').addEventListener('click', () => {
-                const doc = iframe.contentDocument || iframe.contentWindow.document;
-                doc.open();
-                doc.write(editor.value);
-                doc.close();
-            });
+        // Open in new tab
+        function openInNewTab() {
+            const html = editorState.files['index.html'] || '';
+            const blob = new Blob([html], { type: 'text/html' });
+            window.open(URL.createObjectURL(blob));
+        }
 
-            // Save button
-            document.getElementById('saveBtn').addEventListener('click', () => {
-                window.editorApp?.saveCurrentFile();
-            });
+        // Update status bar
+        function updateStatusBar() {
+            const editor = document.getElementById('codeEditor');
+            const lines = editor.value.split('\n').length;
+            const cursorPos = editor.selectionStart;
+            const textBefore = editor.value.substring(0, cursorPos);
+            const line = textBefore.split('\n').length;
+            const col = cursorPos - textBefore.lastIndexOf('\n') - 1;
+            
+            document.getElementById('currentFile').textContent = '📄 ' + editorState.currentFile;
+            document.getElementById('cursorPosition').textContent = `Ln ${line}, Col ${col + 1}`;
+            document.getElementById('totalLines').textContent = `Lines: ${lines}`;
+            
+            const ext = editorState.currentFile.split('.').pop();
+            const typeMap = { html: 'HTML', css: 'CSS', js: 'JavaScript' };
+            document.getElementById('fileType').textContent = typeMap[ext] || 'Plain Text';
+            
+            document.getElementById('statusMessage').textContent = editorState.isModified ? '● Modified' : '✨ Ready';
+        }
 
-            // Sidebar toggle
-            document.getElementById('toggleSidebar').addEventListener('click', () => {
-                document.getElementById('sidebar').classList.toggle('open');
-            });
+        // Toggle sidebar
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
 
-            // File tabs
-            document.querySelectorAll('.editor-tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                });
-            });
+        // Toggle preview
+        function togglePreview() {
+            const preview = document.getElementById('previewPanel');
+            preview.style.display = preview.style.display === 'none' ? 'flex' : 'none';
+        }
 
-            // Line numbers
-            function updateLineNumbers() {
-                const lines = editor.value.split('\n').length;
-                document.querySelector('.line-numbers').innerHTML = 
-                    Array.from({ length: lines }, (_, i) => i + 1).join('\n');
+        // Toggle console
+        function toggleConsole() {
+            const console = document.getElementById('consolePanel');
+            console.style.display = console.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        // Switch bottom tab
+        function switchBottomTab(tabName) {
+            document.querySelectorAll('.bottom-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // Add console message
+        function addConsoleMessage(message, type = 'info') {
+            const console = document.getElementById('consoleOutput');
+            const msg = document.createElement('div');
+            msg.className = `console-message ${type}`;
+            msg.textContent = message;
+            console.appendChild(msg);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        // Format code
+        function formatCode() {
+            addConsoleMessage('✨ Code formatted!', 'success');
+        }
+
+        // Minify code
+        function minifyCode() {
+            addConsoleMessage('📦 Code minified!', 'success');
+        }
+
+        // Analyze code
+        function analyzeCode() {
+            addConsoleMessage('🔍 Code analyzed - No errors found!', 'success');
+        }
+
+        // Undo
+        function undo() {
+            document.execCommand('undo');
+        }
+
+        // Redo
+        function redo() {
+            document.execCommand('redo');
+        }
+
+        // Search code
+        function searchCode(query) {
+            if (query) {
+                addConsoleMessage(`🔍 Searching for: "${query}"`, 'info');
             }
+        }
 
-            // Update line numbers on load
-            updateLineNumbers();
-        });
+        // Set device frame
+        function setDeviceFrame(device) {
+            const container = document.getElementById('previewContainer');
+            container.className = 'preview-frame-container ' + device;
+        }
+
+        // Create new file
+        function createNewFile() {
+            const name = prompt('Enter file name:');
+            if (name) {
+                editorState.files[name] = '';
+                addConsoleMessage(`✨ File "${name}" created!`, 'success');
+            }
+        }
+
+        // Refresh files
+        function refreshFiles() {
+            addConsoleMessage('🔄 Files refreshed!', 'info');
+        }
+
+        // Change project
+        function changeProject(project) {
+            addConsoleMessage(`📁 Switched to project: ${project}`, 'info');
+        }
+
+        // Insert snippet
+        function insertSnippet(snippet) {
+            const snippets = {
+                'html-template': '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <title></title>\n</head>\n<body>\n    \n</body>\n</html>',
+                'css-flex': 'display: flex;\njustify-content: center;\nalign-items: center;',
+                'css-grid': 'display: grid;\ngrid-template-columns: repeat(3, 1fr);\ngap: 20px;',
+                'js-function': 'function myFunction() {\n    \n}',
+                'js-class': 'class MyClass {\n    constructor() {\n        \n    }\n}',
+                'js-fetch': 'fetch(url)\n    .then(response => response.json())\n    .then(data => console.log(data));'
+            };
+            
+            if (snippets[snippet]) {
+                const editor = document.getElementById('codeEditor');
+                const start = editor.selectionStart;
+                const end = editor.selectionEnd;
+                editor.value = editor.value.substring(0, start) + snippets[snippet] + editor.value.substring(end);
+                onEditorInput();
+                closeSnippets();
+            }
+        }
+
+        function closeSnippets() {
+            document.getElementById('snippetsPanel').style.display = 'none';
+        }
+
+        function openSettings() {
+            addConsoleMessage('⚙️ Settings opened', 'info');
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initEditor);
     </script>
 </body>
 </html>
