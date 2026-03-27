@@ -798,7 +798,13 @@
         // ===== Initialize =====
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Editor initializing...');
-            loadFiles('default'); // Load default project files
+            
+            // Get project from URL or use default
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectFromUrl = urlParams.get('project');
+            currentProject = projectFromUrl || 'default';
+            
+            loadFiles(currentProject); // Load project files
             
             // Set up event listeners
             const textarea = document.getElementById('editor-textarea');

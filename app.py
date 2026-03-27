@@ -23,9 +23,10 @@ def index():
 def main_editor():
     return render_template('main.html')
 
-@app.route('/editing')
-def editing_page():
-    return render_template('editing-page.html')
+@app.route('/editor')
+def editor_page():
+    project = request.args.get('project', 'default')
+    return render_template('editing-page.html', project=project)
 
 @app.route('/about')
 def about():
