@@ -2,15 +2,252 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>AmkyawDev Editor - Editing</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/editing.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/transforms.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='assets/icons/favicon.ico') }}" type="image/x-icon">
+    <style>
+        /* 额外的响应式优化 - 增强移动端体验 */
+        .menu-toggle-mobile {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-right: 10px;
+            line-height: 1;
+        }
+
+        /* 移动端滑出遮罩层 */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            backdrop-filter: blur(2px);
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* 桌面端及大屏默认样式保持不变 */
+        @media (max-width: 768px) {
+            .menu-toggle-mobile {
+                display: block;
+            }
+            
+            .editor-navbar {
+                padding: 0.5rem 0.8rem;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            .project-info {
+                font-size: 0.75rem;
+                flex: 1;
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            
+            .project-info span {
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .editor-actions {
+                gap: 6px;
+            }
+            
+            .btn {
+                padding: 4px 10px;
+                font-size: 0.75rem;
+            }
+            
+            /* 侧边栏改为滑出面板 */
+            .sidebar {
+                position: fixed;
+                top: 50px; /* navbar高度 */
+                left: -280px;
+                width: 280px;
+                height: calc(100% - 50px);
+                z-index: 999;
+                background-color: var(--sidebar-bg);
+                border-right: none;
+                box-shadow: 2px 0 12px rgba(0, 0, 0, 0.3);
+                transition: left 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+                overflow-y: auto;
+            }
+            
+            .sidebar.open {
+                left: 0;
+            }
+            
+            .editor-container {
+                position: relative;
+            }
+            
+            .editor-main {
+                width: 100%;
+                transition: margin-left 0.2s;
+            }
+            
+            /* 预览面板全屏覆盖 */
+            .preview-panel:not(.hidden) {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 1100;
+                background-color: white;
+                border-left: none;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .preview-header {
+                padding: 12px 16px;
+                background-color: #f5f5f5;
+            }
+            
+            .preview-header h3 {
+                font-size: 1rem;
+            }
+            
+            #preview-iframe {
+                height: 100%;
+            }
+            
+            /* 标签栏横向滚动优化 */
+            .editor-tabs {
+                overflow-x: auto;
+                scrollbar-width: thin;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .tab {
+                min-width: 85px;
+                font-size: 0.75rem;
+                padding: 0 12px;
+                white-space: nowrap;
+            }
+            
+            /* 代码编辑器区域调整 */
+            .code-editor {
+                height: calc(100% - 35px);
+            }
+            
+            #editor-textarea {
+                padding: 16px;
+                font-size: 0.9rem;
+                line-height: 1.45;
+            }
+            
+            .file-item {
+                padding: 10px 20px;
+                font-size: 0.85rem;
+            }
+            
+            .sidebar-header {
+                padding: 12px 16px;
+            }
+            
+            .sidebar-header h3 {
+                font-size: 0.9rem;
+            }
+            
+            .btn-icon {
+                font-size: 1.3rem;
+                padding: 0 6px;
+            }
+        }
+        
+        /* 超小屏幕进一步优化 */
+        @media (max-width: 480px) {
+            .editor-navbar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            
+            .logo {
+                text-align: center;
+                order: 0;
+            }
+            
+            .project-info {
+                justify-content: center;
+                order: 1;
+            }
+            
+            .editor-actions {
+                justify-content: center;
+                order: 2;
+            }
+            
+            .menu-toggle-mobile {
+                position: absolute;
+                left: 10px;
+                top: 12px;
+            }
+            
+            .sidebar {
+                top: 90px; /* 适应增高后的navbar */
+                height: calc(100% - 90px);
+            }
+            
+            .btn {
+                padding: 5px 12px;
+            }
+        }
+        
+        /* 平滑滚动与触摸优化 */
+        .file-list, .editor-tabs {
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* 桌面端保留侧边栏固定显示，移动端默认隐藏但通过JS控制显示 */
+        @media (min-width: 769px) {
+            .sidebar {
+                display: flex;
+            }
+            
+            .sidebar-overlay {
+                display: none !important;
+            }
+        }
+        
+        /* 增强预览面板关闭按钮体验 */
+        #close-preview {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: #555;
+            transition: color 0.2s;
+        }
+        
+        #close-preview:hover {
+            color: #e74c3c;
+        }
+    </style>
 </head>
 <body class="editor-body">
     <nav class="editor-navbar">
-        <div class="logo">AmkyawDev<span>Editor</span></div>
+        <div style="display: flex; align-items: center;">
+            <button id="mobile-menu-toggle" class="menu-toggle-mobile" aria-label="Toggle Sidebar">☰</button>
+            <div class="logo">AmkyawDev<span>Editor</span></div>
+        </div>
         <div class="project-info">
             <span id="current-project-name">Project Name</span>
             <span class="separator">/</span>
@@ -24,7 +261,10 @@
     </nav>
 
     <div class="editor-container">
-        <aside class="sidebar">
+        <!-- 移动端遮罩层 -->
+        <div id="sidebar-overlay" class="sidebar-overlay"></div>
+        
+        <aside id="main-sidebar" class="sidebar">
             <div class="sidebar-header">
                 <h3>Files</h3>
                 <button id="new-file-btn" class="btn-icon">+</button>
@@ -48,7 +288,7 @@
                 <h3>Live Preview</h3>
                 <button id="close-preview" class="btn-icon">&times;</button>
             </div>
-            <iframe id="preview-iframe" src="about:blank"></iframe>
+            <iframe id="preview-iframe" src="about:blank" title="Live Preview"></iframe>
         </section>
     </div>
 
@@ -58,5 +298,196 @@
     <script src="{{ url_for('static', filename='components/cssEditor.js') }}"></script>
     <script src="{{ url_for('static', filename='components/jsEditor.js') }}"></script>
     <script src="{{ url_for('static', filename='components/previewSystem.js') }}"></script>
+    
+    <script>
+        // 增强移动端交互：侧边栏滑出、遮罩关闭、预览面板自动适配关闭侧边栏等
+        (function() {
+            const sidebar = document.getElementById('main-sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            const menuToggle = document.getElementById('mobile-menu-toggle');
+            const previewBtn = document.getElementById('preview-btn');
+            const closePreviewBtn = document.getElementById('close-preview');
+            const previewPanel = document.getElementById('preview-panel');
+            
+            // 检查是否为移动端视图 (根据媒体查询或宽度)
+            function isMobileView() {
+                return window.innerWidth <= 768;
+            }
+            
+            // 关闭侧边栏
+            function closeSidebar() {
+                if (sidebar && isMobileView()) {
+                    sidebar.classList.remove('open');
+                    if (overlay) overlay.classList.remove('active');
+                }
+            }
+            
+            // 打开侧边栏
+            function openSidebar() {
+                if (sidebar && isMobileView()) {
+                    sidebar.classList.add('open');
+                    if (overlay) overlay.classList.add('active');
+                }
+            }
+            
+            // 切换侧边栏
+            function toggleSidebar() {
+                if (!isMobileView()) return;
+                if (sidebar.classList.contains('open')) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+            }
+            
+            // 点击遮罩关闭侧边栏
+            if (overlay) {
+                overlay.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    closeSidebar();
+                });
+            }
+            
+            // 移动端菜单按钮事件
+            if (menuToggle) {
+                menuToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleSidebar();
+                });
+            }
+            
+            // 点击文件列表项时自动关闭侧边栏（提升移动端操作流畅度）
+            const fileList = document.getElementById('file-list');
+            if (fileList) {
+                fileList.addEventListener('click', function(e) {
+                    // 延迟关闭，避免快速点击时事件冲突，提升体验
+                    if (isMobileView() && sidebar.classList.contains('open')) {
+                        setTimeout(() => {
+                            closeSidebar();
+                        }, 150);
+                    }
+                });
+            }
+            
+            // 新建文件按钮点击后也关闭侧边栏（移动端）
+            const newFileBtn = document.getElementById('new-file-btn');
+            if (newFileBtn) {
+                newFileBtn.addEventListener('click', function() {
+                    if (isMobileView() && sidebar.classList.contains('open')) {
+                        setTimeout(() => {
+                            closeSidebar();
+                        }, 100);
+                    }
+                });
+            }
+            
+            // 预览按钮增强：移动端打开预览时自动关闭侧边栏，并保证预览面板全屏展示
+            if (previewBtn) {
+                const originalPreviewClick = previewBtn.onclick;
+                previewBtn.addEventListener('click', function(e) {
+                    // 移动端自动关闭侧边栏
+                    if (isMobileView()) {
+                        closeSidebar();
+                        // 如果预览面板目前隐藏，添加额外样式优化
+                        if (previewPanel && previewPanel.classList.contains('hidden')) {
+                            // 等待预览系统显示后再做额外滚动锁定
+                            setTimeout(() => {
+                                if (!previewPanel.classList.contains('hidden')) {
+                                    document.body.style.overflow = 'hidden';
+                                }
+                            }, 50);
+                        }
+                    }
+                });
+            }
+            
+            // 关闭预览时恢复body滚动（移动端）
+            if (closePreviewBtn) {
+                closePreviewBtn.addEventListener('click', function() {
+                    if (isMobileView()) {
+                        document.body.style.overflow = '';
+                    }
+                });
+            }
+            
+            // 监听预览面板显示/隐藏的变化（使用MutationObserver确保全屏时body不滚动）
+            if (previewPanel) {
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.attributeName === 'class') {
+                            const isHidden = previewPanel.classList.contains('hidden');
+                            if (isMobileView()) {
+                                if (!isHidden) {
+                                    document.body.style.overflow = 'hidden';
+                                    // 同时确保侧边栏关闭
+                                    closeSidebar();
+                                } else {
+                                    document.body.style.overflow = '';
+                                }
+                            }
+                        }
+                    });
+                });
+                observer.observe(previewPanel, { attributes: true });
+            }
+            
+            // 窗口大小变化时重置侧边栏状态和预览样式
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    if (!isMobileView()) {
+                        // 桌面端强制关闭移动端侧边栏状态
+                        if (sidebar) sidebar.classList.remove('open');
+                        if (overlay) overlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                        // 确保预览面板样式在桌面端恢复正常
+                        if (previewPanel && !previewPanel.classList.contains('hidden')) {
+                            previewPanel.style.position = '';
+                            previewPanel.style.width = '';
+                            previewPanel.style.height = '';
+                            previewPanel.style.zIndex = '';
+                        }
+                    } else {
+                        // 移动端：如果侧边栏被意外残留状态，重置一下
+                        if (sidebar && !sidebar.classList.contains('open')) {
+                            if (overlay) overlay.classList.remove('active');
+                        }
+                        // 预览面板在移动端如打开确保全屏样式
+                        if (previewPanel && !previewPanel.classList.contains('hidden')) {
+                            document.body.style.overflow = 'hidden';
+                        } else {
+                            document.body.style.overflow = '';
+                        }
+                    }
+                }, 150);
+            });
+            
+            // 初始检查：桌面端清除任何移动端遗留样式
+            if (!isMobileView()) {
+                if (sidebar) sidebar.classList.remove('open');
+                if (overlay) overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+            
+            // 标签页和编辑器区域触摸优化：防止侧边栏意外弹出
+            const editorMain = document.querySelector('.editor-main');
+            if (editorMain) {
+                editorMain.addEventListener('touchstart', function(e) {
+                    // 点击编辑区关闭侧边栏（移动端习惯）
+                    if (isMobileView() && sidebar && sidebar.classList.contains('open')) {
+                        closeSidebar();
+                    }
+                });
+            }
+            
+            // 支持侧边栏内滚动穿透控制（优化滚动体验）
+            if (sidebar) {
+                sidebar.addEventListener('touchmove', function(e) {
+                    e.stopPropagation();
+                }, { passive: false });
+            }
+        })();
+    </script>
 </body>
 </html>
