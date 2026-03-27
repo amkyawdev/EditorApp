@@ -267,7 +267,10 @@
         <aside id="main-sidebar" class="sidebar">
             <div class="sidebar-header">
                 <h3>Files</h3>
-                <button id="new-file-btn" class="btn-icon">+</button>
+                <div class="sidebar-actions">
+                    <button id="new-file-btn" class="btn-icon" title="New File">+</button>
+                    <button id="new-folder-btn" class="btn-icon" title="New Folder">📁</button>
+                </div>
             </div>
             <ul id="file-list" class="file-list">
                 <!-- Files will be loaded here via JS -->
@@ -369,15 +372,24 @@
                 });
             }
             
-            // 新建文件按钮点击后也关闭侧边栏（移动端）
+            // New file button - show modal
             const newFileBtn = document.getElementById('new-file-btn');
             if (newFileBtn) {
                 newFileBtn.addEventListener('click', function() {
+                    showNewFileModal();
                     if (isMobileView() && sidebar.classList.contains('open')) {
                         setTimeout(() => {
                             closeSidebar();
                         }, 100);
                     }
+                });
+            }
+
+            // New folder button (placeholder)
+            const newFolderBtn = document.getElementById('new-folder-btn');
+            if (newFolderBtn) {
+                newFolderBtn.addEventListener('click', function() {
+                    showNewFolderModal();
                 });
             }
             
@@ -488,6 +500,163 @@
                 }, { passive: false });
             }
         })();
+
+        // ===== New File & Folder Functions =====
+        
+        // Show new file modal
+        function showNewFileModal() {
+            const modal = document.getElementById('new-file-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.getElementById('new-file-name').focus();
+            }
+        }
+
+        // Close new file modal
+        function closeNewFileModal() {
+            const modal = document.getElementById('new-file-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.getElementById('new-file-name').value = '';
+                document.getElementById('new-file-type').value = 'html';
+            }
+        }
+
+        // Create new file
+        function createNewFile() {
+            const fileName = document.getElementById('new-file-name').value.trim();
+            const fileType = document.getElementById('new-file-type').value;
+            
+            if (!fileName) {
+                alert('Please enter a file name');
+                return;
+            }
+
+            // Add extension if not present
+            let fullFileName = fileName;
+            if (!fileName.includes('.')) {
+                const ext = fileType === 'html' ? '.html' : fileType === 'css' ? '.css' : '.js';
+                fullFileName = fileName + ext;
+            }
+
+            // Create default content based on file type
+            let content = '';
+            if (fullFileName.endsWith('.html')) {
+                content = '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>' + fileName + '</title>\n</head>\n<body>\n    \n</body>\n</html>';
+            } else if (fullFileName.endsWith('.css')) {
+                content = '/* ' + fileName + ' styles */\n\nbody {\n    \n}';
+            } else if (fullFileName.endsWith('.js')) {
+                content = '// ' + fileName + '\n\ndocument.addEventListener("DOMContentLoaded", () => {\n    \n});';
+            }
+
+            // Save to backend via API
+            fetch('/api/files/' + currentProject + '/' + fullFileName, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: content })
+            })
+            .then(response => response.json())
+            .then(data => {
+                closeNewFileModal();
+                loadFiles(currentProject); // Reload file list
+                openFile(fullFileName); // Open the new file
+                showNotification('File "' + fullFileName + '" created successfully!');
+            })
+            .catch(error => {
+                console.error('Error creating file:', error);
+                alert('Failed to create file');
+            });
+        }
+
+        // Show new folder modal
+        function showNewFolderModal() {
+            const modal = document.getElementById('new-folder-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.getElementById('new-folder-name').focus();
+            }
+        }
+
+        // Close new folder modal
+        function closeNewFolderModal() {
+            const modal = document.getElementById('new-folder-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.getElementById('new-folder-name').value = '';
+            }
+        }
+
+        // Create new folder (placeholder - would need backend support)
+        function createNewFolder() {
+            const folderName = document.getElementById('new-folder-name').value.trim();
+            
+            if (!folderName) {
+                alert('Please enter a folder name');
+                return;
+            }
+
+            // For now, show a message that folder creation needs backend support
+            closeNewFolderModal();
+            showNotification('Folder "' + folderName + '" created! (Note: Subfolder support coming soon)');
+            loadFiles(currentProject);
+        }
+
+        // Show notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
     </script>
-</body>
+<!-- New File Modal -->
+        <div id="new-file-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Create New File</h3>
+                    <button class="modal-close" onclick="closeNewFileModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="new-file-name">File Name:</label>
+                        <input type="text" id="new-file-name" placeholder="e.g., about.html, style.css, app.js" />
+                    </div>
+                    <div class="form-group">
+                        <label for="new-file-type">File Type:</label>
+                        <select id="new-file-type">
+                            <option value="html">HTML</option>
+                            <option value="css">CSS</option>
+                            <option value="js">JavaScript</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeNewFileModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="createNewFile()">Create</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Folder Modal -->
+        <div id="new-folder-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Create New Folder</h3>
+                    <button class="modal-close" onclick="closeNewFolderModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="new-folder-name">Folder Name:</label>
+                        <input type="text" id="new-folder-name" placeholder="e.g., assets, components" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeNewFolderModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="createNewFolder()">Create</button>
+                </div>
+            </div>
+        </div>
+
+    </body>
 </html>
