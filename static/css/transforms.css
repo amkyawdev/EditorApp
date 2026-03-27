@@ -1,354 +1,40 @@
-/* 3D Transforms & Animations - AmkyawDev EditorApp */
-:root {
-    --transform-perspective: 1000px;
-    --rotate-x: 0deg;
-    --rotate-y: 0deg;
-    --rotate-z: 0deg;
-    --scale: 1;
-    --translate-z: 0px;
+.perspective-container {
+    perspective: 1000px;
 }
 
-/* 3D Container */
-.transform-container {
-    perspective: var(--transform-perspective);
-    transform-style: preserve-3d;
-}
-
-/* 3D Cards */
 .card-3d {
-    transform: rotateX(var(--rotate-x)) rotateY(var(--rotate-y)) rotateZ(var(--rotate-z)) scale(var(--scale));
-    transition: transform 0.3s ease;
+    transition: transform 0.5s;
     transform-style: preserve-3d;
 }
 
 .card-3d:hover {
-    transform: rotateX(5deg) rotateY(-5deg) scale(1.02);
+    transform: rotateY(10deg) rotateX(5deg);
 }
 
-/* 3D Flip */
-.flip-card {
-    position: relative;
-    width: 100%;
-    height: 300px;
-    transform-style: preserve-3d;
-    transition: transform 0.6s ease;
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
 }
 
-.flip-card.flip {
-    transform: rotateY(180deg);
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.flip-front, .flip-back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.slide-in {
+    animation: slideIn 0.3s ease-out;
 }
 
-.flip-front {
-    background: var(--secondary);
-    border: 1px solid var(--border);
+@keyframes slideIn {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
 }
 
-.flip-back {
-    background: var(--gradient);
-    transform: rotateY(180deg);
-}
-
-/* 3D Button Effects */
-.btn-3d {
-    position: relative;
-    transform: translateZ(0);
-    transition: transform 0.2s ease;
-}
-
-.btn-3d:active {
-    transform: translateY(4px) translateZ(-4px);
-}
-
-.btn-3d::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: inherit;
-    transform: translateZ(-1px);
-    background: rgba(0, 0, 0, 0.3);
-}
-
-/* Animated Border */
-.animated-border {
-    position: relative;
-    background: var(--secondary);
-    border-radius: 16px;
-    padding: 30px;
-}
-
-.animated-border::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: var(--gradient);
-    border-radius: 18px;
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.animated-border:hover::before {
-    opacity: 1;
-}
-
-/* Glow Effects */
-.glow {
-    animation: glow 2s ease-in-out infinite;
-}
-
-@keyframes glow {
-    0%, 100% { 
-        box-shadow: 0 0 20px var(--accent-glow), 0 0 40px var(--accent-glow);
-    }
-    50% { 
-        box-shadow: 0 0 40px var(--accent-glow), 0 0 80px var(--accent-glow);
-    }
-}
-
-.glow-text {
-    text-shadow: 0 0 10px var(--accent-glow), 0 0 20px var(--accent-glow), 0 0 40px var(--accent-glow);
-    animation: textGlow 2s ease-in-out infinite;
-}
-
-@keyframes textGlow {
-    0%, 100% { text-shadow: 0 0 10px var(--accent-glow), 0 0 20px var(--accent-glow); }
-    50% { text-shadow: 0 0 20px var(--accent-glow), 0 0 40px var(--accent-glow), 0 0 60px var(--accent-glow); }
-}
-
-/* Floating Animation */
-.float {
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
-}
-
-/* Bounce */
-.bounce {
-    animation: bounce 2s ease-in-out infinite;
-}
-
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    25% { transform: translateY(-10px); }
-    50% { transform: translateY(0); }
-    75% { transform: translateY(-5px); }
-}
-
-/* Pulse */
 .pulse {
-    animation: pulse 2s ease-in-out infinite;
+    animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.05); opacity: 0.8; }
-}
-
-/* Shake */
-.shake {
-    animation: shake 0.5s ease-in-out;
-}
-
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-10px); }
-    75% { transform: translateX(10px); }
-}
-
-/* Spin */
-.spin {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-/* 3D Transform Classes */
-.rotate-x-90 { transform: rotateX(90deg); }
-.rotate-y-90 { transform: rotateY(90deg); }
-.rotate-z-90 { transform: rotateZ(90deg); }
-
-.translate-x-10 { transform: translateX(10px); }
-.translate-y-10 { transform: translateY(10px); }
-.translate-z-10 { transform: translateZ(10px); }
-
-.scale-1-1 { transform: scale(1.1); }
-.scale-0-9 { transform: scale(0.9); }
-
-/* Tilt Effect */
-.tilt {
-    transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
-    transition: transform 0.3s ease;
-}
-
-.tilt:hover {
-    transform: perspective(1000px) rotateX(10deg) rotateY(-10deg);
-}
-
-/* Parallax Layer */
-.parallax-layer {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    transform-style: preserve-3d;
-}
-
-.parallax-layer-1 { transform: translateZ(-50px) scale(1.5); }
-.parallax-layer-2 { transform: translateZ(0px) scale(1); }
-.parallax-layer-3 { transform: translateZ(50px) scale(0.5); }
-
-/* Loading Spinner 3D */
-.spinner-3d {
-    width: 60px;
-    height: 60px;
-    perspective: 200px;
-}
-
-.spinner-3d::before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    border: 4px solid transparent;
-    border-top-color: var(--accent);
-    border-right-color: var(--accent);
-    animation: spin3d 1s linear infinite;
-}
-
-@keyframes spin3d {
-    from { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
-    to { transform: rotateX(360deg) rotateY(180deg) rotateZ(90deg); }
-}
-
-/* Wave Animation */
-.wave {
-    display: inline-block;
-    animation: wave 1s ease-in-out infinite;
-}
-
-@keyframes wave {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-/* Slide Transitions */
-.slide-in-left {
-    animation: slideInLeft 0.5s ease-out;
-}
-
-@keyframes slideInLeft {
-    from { transform: translateX(-100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
-
-.slide-in-right {
-    animation: slideInRight 0.5s ease-out;
-}
-
-@keyframes slideInRight {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
-
-.slide-in-up {
-    animation: slideInUp 0.5s ease-out;
-}
-
-@keyframes slideInUp {
-    from { transform: translateY(100%); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
-.slide-in-down {
-    animation: slideInDown 0.5s ease-out;
-}
-
-@keyframes slideInDown {
-    from { transform: translateY(-100%); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
-/* Zoom Effects */
-.zoom-in {
-    animation: zoomIn 0.3s ease-out;
-}
-
-@keyframes zoomIn {
-    from { transform: scale(0); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-
-.zoom-out {
-    animation: zoomOut 0.3s ease-out;
-}
-
-@keyframes zoomOut {
-    from { transform: scale(2); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-
-/* Flip Animation */
-.flip {
-    animation: flip 0.6s ease-out;
-}
-
-@keyframes flip {
-    from { transform: rotateY(90deg); opacity: 0; }
-    to { transform: rotateY(0); opacity: 1; }
-}
-
-/* 3D Modal */
-.modal-3d {
-    transform: translateZ(0) scale(1);
-    transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.modal-3d.show {
-    transform: translateZ(50px) scale(1.1);
-}
-
-/* Carousel 3D */
-.carousel-3d {
-    perspective: 1500px;
-}
-
-.carousel-item {
-    position: absolute;
-    width: 100%;
-    transform-style: preserve-3d;
-    transition: transform 0.5s ease;
-}
-
-/* Responsive 3D */
-@media (max-width: 768px) {
-    .card-3d:hover {
-        transform: none;
-    }
-    
-    .tilt:hover {
-        transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
-    }
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
 }
