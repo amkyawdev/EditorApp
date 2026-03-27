@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AmkyawDev EditorApp - Loading...</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/transforms.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='assets/icons/favicon.ico') }}">
+    <style>
+        .loader-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+        }
+        .loader-logo {
+            font-size: 3rem;
+            animation: float 3s ease-in-out infinite;
+        }
+        .loader-bar {
+            width: 200px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .loader-progress {
+            height: 100%;
+            background: var(--gradient);
+            width: 0%;
+            animation: load 2s ease-in-out forwards;
+        }
+        @keyframes load {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+        .loader-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    
+    <div class="loader-page">
+        <div class="loader-logo">✨</div>
+        <div class="loader-bar">
+            <div class="loader-progress"></div>
+        </div>
+        <div class="loader-text">Loading AmkyawDev EditorApp...</div>
+    </div>
+
+    <script>
+        // Redirect to main page after loading
+        setTimeout(() => {
+            window.location.href = '/main';
+        }, 2500);
+    </script>
+</body>
+</html>

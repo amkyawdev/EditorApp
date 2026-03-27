@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AmkyawDev EditorApp - Editor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/editing.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/transforms.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='assets/icons/favicon.ico') }}">
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <a href="/" class="logo">
+            <div class="logo-icon">✨</div>
+            <span>EditorApp</span>
+        </a>
+        <nav class="nav">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/editor" class="nav-link active">Editor</a>
+            <a href="/about" class="nav-link">About</a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <section class="hero">
+            <h1 class="hero-title">Code. Create. Compile.</h1>
+            <p class="hero-subtitle">A powerful web-based code editor with live preview, syntax highlighting, and smooth animations.</p>
+            <div class="btn-group">
+                <a href="/editor" class="btn btn-primary">Open Editor 🚀</a>
+                <a href="/about" class="btn btn-secondary">Learn More</a>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="container">
+            <div class="features">
+                <div class="card feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h3 class="card-title">Smart Editor</h3>
+                    <p class="card-text">Syntax highlighting, auto-completion, and line numbers for HTML, CSS, and JavaScript.</p>
+                </div>
+                <div class="card feature-card">
+                    <div class="feature-icon">👁️</div>
+                    <h3 class="card-title">Live Preview</h3>
+                    <p class="card-text">See your changes instantly with real-time preview panel. No refresh needed!</p>
+                </div>
+                <div class="card feature-card">
+                    <div class="feature-icon">📁</div>
+                    <h3 class="card-title">File System</h3>
+                    <p class="card-text">Create, edit, and manage multiple files with our advanced file browser.</p>
+                </div>
+                <div class="card feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3 class="card-title">Mobile Ready</h3>
+                    <p class="card-text">Fully responsive design that works perfectly on all devices.</p>
+                </div>
+                <div class="card feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="card-title">Smooth System</h3>
+                    <p class="card-text">Beautiful animations and transitions powered by our custom smooth system.</p>
+                </div>
+                <div class="card feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3 class="card-title">Beautiful UI</h3>
+                    <p class="card-text">Modern dark theme with accent colors and glowing effects.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/smoothsystem.js') }}"></script>
+</body>
+</html>

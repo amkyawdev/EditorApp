@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AmkyawDev EditorApp - Advanced Editor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/editing.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/transforms.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='assets/icons/favicon.ico') }}">
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <a href="/" class="logo">
+            <div class="logo-icon">✨</div>
+            <span>EditorApp</span>
+        </a>
+        <nav class="nav">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/main" class="nav-link">Dashboard</a>
+            <a href="/editor" class="nav-link active">Editor</a>
+            <a href="/about" class="nav-link">About</a>
+        </nav>
+    </header>
+
+    <!-- Editor Container -->
+    <div class="editor-container">
+        <!-- Sidebar -->
+        <aside class="editor-sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">Files</span>
+                <div class="sidebar-actions">
+                    <button class="sidebar-btn" title="New File">+</button>
+                    <button class="sidebar-btn" title="Refresh">↻</button>
+                </div>
+            </div>
+            
+            <!-- File Tree -->
+            <div class="file-tree">
+                <div class="file-item active" data-filename="index.html">
+                    <span class="file-icon html">📄</span>
+                    <span>index.html</span>
+                </div>
+                <div class="file-item" data-filename="style.css">
+                    <span class="file-icon css">🎨</span>
+                    <span>style.css</span>
+                </div>
+                <div class="file-item" data-filename="script.js">
+                    <span class="file-icon js">⚡</span>
+                    <span>script.js</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Editor Panels -->
+        <div class="editor-panels">
+            <!-- Toolbar -->
+            <div class="editor-toolbar">
+                <button class="toolbar-btn primary" id="runBtn">▶ Run</button>
+                <button class="toolbar-btn" id="saveBtn">💾 Save</button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" id="formatBtn">✨ Format</button>
+                <button class="toolbar-btn" id="undoBtn">↩ Undo</button>
+                <button class="toolbar-btn" id="redoBtn">↪ Redo</button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" id="toggleSidebar">☰ Sidebar</button>
+                <button class="toolbar-btn" id="togglePreview">👁️ Preview</button>
+            </div>
+
+            <!-- Editor Tabs -->
+            <div class="editor-tabs">
+                <div class="editor-tab active" data-file="index.html">
+                    <span class="file-icon html">📄</span>
+                    <span>index.html</span>
+                    <span class="tab-close">×</span>
+                </div>
+                <div class="editor-tab" data-file="style.css">
+                    <span class="file-icon css">🎨</span>
+                    <span>style.css</span>
+                    <span class="tab-close">×</span>
+                </div>
+                <div class="editor-tab" data-file="script.js">
+                    <span class="file-icon js">⚡</span>
+                    <span>script.js</span>
+                    <span class="tab-close">×</span>
+                </div>
+            </div>
+
+            <!-- Code Area -->
+            <div class="code-area">
+                <div class="line-numbers">1</div>
+                <textarea class="code-editor" id="codeEditor" spellcheck="false" placeholder="Start coding...">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;My Project&lt;/title&gt;
+    &lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="container"&gt;
+        &lt;h1&gt;Hello, World!&lt;/h1&gt;
+        &lt;p&gt;Welcome to AmkyawDev EditorApp.&lt;/p&gt;
+        &lt;button class="btn"&gt;Click Me&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;script src="script.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</textarea>
+            </div>
+
+            <!-- Preview Panel -->
+            <div class="preview-panel">
+                <div class="preview-header">
+                    <span class="preview-title">Preview</span>
+                    <div class="preview-actions">
+                        <button class="toolbar-btn" id="refreshPreview">↻</button>
+                        <button class="toolbar-btn" id="openNewTab">↗</button>
+                    </div>
+                </div>
+                <iframe class="preview-iframe" id="previewFrame"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-left">
+            <span class="status-item">📄 index.html</span>
+            <span class="status-item">UTF-8</span>
+        </div>
+        <div class="status-right">
+            <span class="status-item">Ln 1, Col 1</span>
+            <span class="status-item">HTML</span>
+            <span class="status-item">✨ Ready</span>
+        </div>
+    </div>
+
+    <!-- Component Scripts -->
+    <script src="{{ url_for('static', filename='components/htmlEditor.js') }}"></script>
+    <script src="{{ url_for('static', filename='components/cssEditor.js') }}"></script>
+    <script src="{{ url_for('static', filename='components/jsEditor.js') }}"></script>
+    <script src="{{ url_for('static', filename='components/previewSystem.js') }}"></script>
+    
+    <!-- Main Scripts -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/advancedFileSystem.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/smoothsystem.js') }}"></script>
+
+    <script>
+        // Initialize editors when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            const codeArea = document.querySelector('.code-area');
+            const previewPanel = document.querySelector('.preview-panel');
+            
+            // Create editor components
+            window.htmlEditor = new HTMLEditor(codeArea);
+            window.previewSystem = new PreviewSystem(previewPanel);
+            
+            // Initialize preview with default content
+            const editor = document.getElementById('codeEditor');
+            const iframe = document.getElementById('previewFrame');
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            doc.open();
+            doc.write(editor.value);
+            doc.close();
+
+            // Update preview on input
+            editor.addEventListener('input', () => {
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                doc.open();
+                doc.write(editor.value);
+                doc.close();
+                updateLineNumbers();
+            });
+
+            // Run button
+            document.getElementById('runBtn').addEventListener('click', () => {
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                doc.open();
+                doc.write(editor.value);
+                doc.close();
+            });
+
+            // Save button
+            document.getElementById('saveBtn').addEventListener('click', () => {
+                window.editorApp?.saveCurrentFile();
+            });
+
+            // Sidebar toggle
+            document.getElementById('toggleSidebar').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('open');
+            });
+
+            // File tabs
+            document.querySelectorAll('.editor-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                });
+            });
+
+            // Line numbers
+            function updateLineNumbers() {
+                const lines = editor.value.split('\n').length;
+                document.querySelector('.line-numbers').innerHTML = 
+                    Array.from({ length: lines }, (_, i) => i + 1).join('\n');
+            }
+
+            // Update line numbers on load
+            updateLineNumbers();
+        });
+    </script>
+</body>
+</html>
