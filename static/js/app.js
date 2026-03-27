@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModal = document.querySelector('.close');
     const newProjectForm = document.getElementById('new-project-form');
 
-    // Load projects
+    // Load projects (expects array of { id, name })
     async function loadProjects() {
         try {
             const response = await fetch('/api/projects');
@@ -22,10 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const card = document.createElement('div');
                 card.className = 'project-card fade-in';
                 card.innerHTML = `
-                    <h3>${project}</h3>
+                    <h3>${escapeHtml(project.name)}</h3>
                     <div class="project-actions">
-                        <button class="btn btn-primary open-btn" data-name="${project}">Open</button>
-                        <button class="btn btn-danger delete-btn" data-name="${project}">Delete</button>
+                        <button class="btn btn-primary open-btn" data-id="${project.id}" data-name="${escapeHtml(project.name)}">Open</button>
+                        <button class="btn btn-danger delete-btn" data-id="${project.id}" data-name="${escapeHtml(project.name)}">Delete</button>
                     </div>
                 `;
                 projectsGrid.appendChild(card);
@@ -34,19 +34,23 @@ document.addEventListener('DOMContentLoaded', () => {
             // Add event listeners to buttons
             document.querySelectorAll('.open-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    const name = e.target.getAttribute('data-name');
-                    localStorage.setItem('currentProject', name);
-                    window.location.href = '/editing';
+                    const projectId = e.target.getAttribute('data-id');
+                    // Pass project_id to editing page via URL parameter
+                    window.location.href = `/editing?project_id=${projectId}`;
                 });
             });
 
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
-                    const name = e.target.getAttribute('data-name');
-                    if (confirm(`Are you sure you want to delete project "${name}"?`)) {
-                        const response = await fetch(`/api/projects/${name}`, { method: 'DELETE' });
+                    const projectId = e.target.getAttribute('data-id');
+                    const projectName = e.target.getAttribute('data-name');
+                    if (confirm(`Are you sure you want to delete project "${projectName}"?`)) {
+                        const response = await fetch(`/api/projects/${projectId}`, { method: 'DELETE' });
                         if (response.ok) {
                             loadProjects();
+                        } else {
+                            const err = await response.json();
+                            alert(err.error || 'Failed to delete project');
                         }
                     }
                 });
@@ -65,11 +69,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (event.target == projectModal) projectModal.style.display = 'none';
     };
 
-    // Create project
+    // Create project (with default index.html)
     newProjectForm.onsubmit = async (e) => {
         e.preventDefault();
-        const name = document.getElementById('project-name').value;
-        
+        const name = document.getElementById('project-name').value.trim();
+        if (!name) return;
+
         try {
             const response = await fetch('/api/projects', {
                 method: 'POST',
@@ -78,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             
             if (response.ok) {
+                const newProject = await response.json(); // expected { id, name }
                 projectModal.style.display = 'none';
                 newProjectForm.reset();
                 loadProjects();
@@ -87,8 +93,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Error creating project:', error);
+            alert('Network error. Please try again.');
         }
     };
+
+    // Helper to prevent XSS
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
 
     loadProjects();
 });
