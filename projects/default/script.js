@@ -1,10 +1,11 @@
-// Default JavaScript
 document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.querySelector('.btn');
+    const button = document.getElementById('click-me');
     
-    btn.addEventListener('click', () => {
-        alert('Hello! Thanks for using AmkyawDev EditorApp! 🎉');
+    button.addEventListener('click', () => {
+        alert('Hello from AmkyawDev Editor! You just clicked the button in your live preview.');
+        button.style.backgroundColor = '#3498db';
+        button.textContent = 'Clicked!';
     });
     
-    console.log('🚀 Project loaded successfully!');
+    console.log('Default project script loaded successfully.');
 });
