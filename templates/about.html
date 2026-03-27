@@ -3,164 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About - AmkyawDev EditorApp</title>
+    <title>AmkyawDev Editor - About</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/transforms.css') }}">
-    <link rel="icon" href="{{ url_for('static', filename='assets/icons/favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/icons/favicon.ico') }}" type="image/x-icon">
 </head>
 <body>
-    <div class="bg-animation"></div>
+    <nav class="navbar">
+        <div class="logo">AmkyawDev<span>Editor</span></div>
+        <ul class="nav-links">
+            <li><a href="/main">Projects</a></li>
+            <li><a href="/about" class="active">About</a></li>
+        </ul>
+    </nav>
 
-    <!-- Header -->
-    <header class="header">
-        <a href="/" class="logo">
-            <div class="logo-icon">✨</div>
-            <span>EditorApp</span>
-        </a>
-        <nav class="nav">
-            <a href="/" class="nav-link">Home</a>
-            <a href="/main" class="nav-link">Dashboard</a>
-            <a href="/editor" class="nav-link">Editor</a>
-            <a href="/about" class="nav-link active">About</a>
-        </nav>
-    </header>
+    <main class="container">
+        <header class="about-header">
+            <h1>About AmkyawDev Editor</h1>
+            <p>A powerful, lightweight, and modern web-based code editor for developers.</p>
+        </header>
 
-    <!-- About Container -->
-    <div class="about-container">
-        <!-- Hero Section -->
-        <section class="about-hero">
-            <div class="about-avatar">👨‍💻</div>
-            <h1 class="about-title">AmkyawDev</h1>
-            <p class="about-subtitle">Full Stack Developer & UI/UX Designer</p>
-            
-            <!-- Social Links -->
-            <div class="social-links">
-                <a href="#" class="social-link" title="GitHub">🐙</a>
-                <a href="#" class="social-link" title="Twitter">🐦</a>
-                <a href="#" class="social-link" title="LinkedIn">💼</a>
-                <a href="#" class="social-link" title="Email">📧</a>
+        <section class="about-content">
+            <div class="about-card">
+                <h2>Our Mission</h2>
+                <p>AmkyawDev Editor is designed to provide a seamless development experience directly in your browser. Whether you're a beginner or an experienced developer, our tool offers the features you need to build and test your web projects efficiently.</p>
+            </div>
+
+            <div class="about-card">
+                <h2>Key Features</h2>
+                <ul class="features-list">
+                    <li><strong>Project Management:</strong> Easily create, manage, and delete multiple web projects.</li>
+                    <li><strong>Multi-File Editing:</strong> Edit HTML, CSS, and JavaScript files with a clean, intuitive interface.</li>
+                    <li><strong>Live Preview:</strong> See your changes in real-time with our integrated preview system.</li>
+                    <li><strong>Modern UI:</strong> A sleek, responsive design that works across different devices.</li>
+                    <li><strong>File System:</strong> Advanced file management for organizing your project assets.</li>
+                </ul>
+            </div>
+
+            <div class="about-card">
+                <h2>Technology Stack</h2>
+                <p>Built with modern web technologies to ensure performance and reliability:</p>
+                <ul class="tech-stack">
+                    <li><strong>Backend:</strong> Flask (Python)</li>
+                    <li><strong>Frontend:</strong> HTML5, CSS3, JavaScript (ES6+)</li>
+                    <li><strong>Styling:</strong> Custom CSS with 3D transforms and smooth transitions</li>
+                    <li><strong>API:</strong> RESTful API for file and project operations</li>
+                </ul>
             </div>
         </section>
 
-        <!-- Stats Section -->
-        <section class="stats">
-            <div class="stat-card">
-                <div class="stat-number">150+</div>
-                <div class="stat-label">Projects Built</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">2,500+</div>
-                <div class="stat-label">Active Users</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">5,000+</div>
-                <div class="stat-label">Git Commits</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">4.9★</div>
-                <div class="stat-label">App Rating</div>
-            </div>
-        </section>
-
-        <!-- Timeline Section -->
-        <section class="timeline">
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <div class="timeline-year">2024</div>
-                    <div class="timeline-title">Started Development</div>
-                    <div class="timeline-desc">Began building the EditorApp from scratch with modern web technologies.</div>
-                </div>
-                <div class="timeline-dot"></div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <div class="timeline-year">2024</div>
-                    <div class="timeline-title">First Release</div>
-                    <div class="timeline-desc">Launched v1.0 with basic editor features and live preview.</div>
-                </div>
-                <div class="timeline-dot"></div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <div class="timeline-year">2025</div>
-                    <div class="timeline-title">Major Update</div>
-                    <div class="timeline-desc">Added advanced editing capabilities, syntax highlighting, and file management.</div>
-                </div>
-                <div class="timeline-dot"></div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <div class="timeline-year">2025</div>
-                    <div class="timeline-title">Mobile Support</div>
-                    <div class="timeline-desc">Fully responsive mobile webapp with touch gestures and smooth animations.</div>
-                </div>
-                <div class="timeline-dot"></div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <div class="timeline-year">2026</div>
-                    <div class="timeline-title">Current Version</div>
-                    <div class="timeline-desc">Smooth system, beautiful UI, and powerful editing experience.</div>
-                </div>
-                <div class="timeline-dot"></div>
-            </div>
-        </section>
-
-        <!-- Skills Section -->
-        <section class="skills-section">
-            <h2 class="skills-title">Skills & Technologies</h2>
-            <div class="skills-grid">
-                <div class="skill-item">
-                    <div class="skill-icon">🌐</div>
-                    <div class="skill-name">HTML</div>
-                </div>
-                <div class="skill-item">
-                    <div class="skill-icon">🎨</div>
-                    <div class="skill-name">CSS</div>
-                </div>
-                <div class="skill-item">
-                    <div class="skill-icon">⚡</div>
-                    <div class="skill-name">JavaScript</div>
-                </div>
-                <div class="skill-item">
-                    <div class="skill-icon">🐍</div>
-                    <div class="skill-name">Python</div>
-                </div>
-                <div class="skill-item">
-                    <div class="skill-icon">⚛️</div>
-                    <div class="skill-name">React</div>
-                </div>
-                <div class="skill-item">
-                    <div class="skill-icon">🟢</div>
-                    <div class="skill-name">Node.js</div>
-                </div>
-                <div class="skill-item">
-                    <div class="skill-icon">🍶</div>
-                    <div class="skill-name">Flask</div>
-                </div>
-                <div class="skill-item">
-                    <div class="skill-icon">🐳</div>
-                    <div class="skill-name">Docker</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contact Section -->
-        <section class="contact-section">
-            <h2 class="contact-title">Get In Touch</h2>
-            <p class="contact-text">Have a project in mind or want to collaborate? Feel free to reach out!</p>
-            <a href="mailto:amkyawdev@example.com" class="btn btn-primary">Contact Me 📧</a>
-        </section>
-    </div>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <p class="footer-text">Made with <span class="footer-heart">❤️</span> by AmkyawDev</p>
-        <p class="footer-text">© 2026 AmkyawDev EditorApp. All rights reserved.</p>
-    </footer>
+        <footer class="about-footer">
+            <p>&copy; 2026 AmkyawDev. All rights reserved.</p>
+        </footer>
+    </main>
 
     <script src="{{ url_for('static', filename='js/about.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/smoothsystem.js') }}"></script>
 </body>
 </html>
