@@ -45,5 +45,81 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        // ===== New Project Functionality =====
+        
+        // Show modal
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('project-modal');
+            const btn = document.getElementById('new-project-btn');
+            const close = document.querySelector('.close');
+            const form = document.getElementById('new-project-form');
+            
+            if (btn) {
+                btn.onclick = function() {
+                    modal.style.display = 'block';
+                }
+            }
+            
+            if (close) {
+                close.onclick = function() {
+                    modal.style.display = 'none';
+                }
+            }
+            
+            if (window.onclick) {
+                window.onclick = function(event) {
+                    if (event.target == modal) {
+                        modal.style.display = 'none';
+                    }
+                }
+            }
+            
+            if (form) {
+                form.onsubmit = function(e) {
+                    e.preventDefault();
+                    const name = document.getElementById('project-name').value.trim();
+                    
+                    fetch('/api/projects', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: name })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        modal.style.display = 'none';
+                        loadProjects(); // Reload projects
+                        alert('Project "' + name + '" created!');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to create project');
+                    });
+                }
+            }
+            
+            // Load projects
+            loadProjects();
+        });
+
+        // Load projects list
+        function loadProjects() {
+            fetch('/api/projects')
+                .then(response => response.json())
+                .then(projects => {
+                    const grid = document.getElementById('projects-grid');
+                    if (!grid) return;
+                    
+                    grid.innerHTML = '';
+                    projects.forEach(project => {
+                        const card = document.createElement('div');
+                        card.className = 'project-card';
+                        card.innerHTML = '<h3>' + project + '</h3><a href="/editing?project=' + project + '" class="btn">Open</a>';
+                        grid.appendChild(card);
+                    });
+                })
+                .catch(error => console.error('Error loading projects:', error));
+        }
+    </script>
 </body>
 </html>

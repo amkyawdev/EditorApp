@@ -303,7 +303,192 @@
     <script src="{{ url_for('static', filename='components/previewSystem.js') }}"></script>
     
     <script>
-        // 增强移动端交互：侧边栏滑出、遮罩关闭、预览面板自动适配关闭侧边栏等
+        // ===== Global Variables =====
+        let currentProject = 'default';
+        let openFiles = [];
+        let currentFile = null;
+        let isModified = false;
+
+        // ===== Core Functions =====
+
+        // Load files for the project
+        function loadFiles(projectName) {
+            currentProject = projectName;
+            fetch('/api/files/' + projectName)
+                .then(response => response.json())
+                .then(files => {
+                    const fileList = document.getElementById('file-list');
+                    if (!fileList) return;
+                    
+                    fileList.innerHTML = '';
+                    files.forEach(file => {
+                        const li = document.createElement('li');
+                        li.className = 'file-item';
+                        li.dataset.filename = file;
+                        li.onclick = () => openFile(file);
+                        
+                        const icon = getFileIcon(file);
+                        li.innerHTML = '<span class="file-icon">' + icon + '</span><span class="file-name">' + file + '</span>';
+                        fileList.appendChild(li);
+                    });
+                    
+                    // Update project name display
+                    const projectNameEl = document.getElementById('current-project-name');
+                    if (projectNameEl) projectNameEl.textContent = projectName;
+                })
+                .catch(error => console.error('Error loading files:', error));
+        }
+
+        // Get file icon based on extension
+        function getFileIcon(filename) {
+            if (filename.endsWith('.html')) return '📄';
+            if (filename.endsWith('.css')) return '🎨';
+            if (filename.endsWith('.js')) return '⚡';
+            if (filename.endsWith('.json')) return '📋';
+            return '📄';
+        }
+
+        // Open a file in the editor
+        function openFile(filename) {
+            if (isModified && currentFile && !confirm('Save changes to ' + currentFile + '?')) {
+                return;
+            }
+
+            fetch('/api/files/' + currentProject + '/' + filename)
+                .then(response => response.json())
+                .then(data => {
+                    currentFile = filename;
+                    isModified = false;
+                    
+                    const textarea = document.getElementById('editor-textarea');
+                    if (textarea) {
+                        textarea.value = data.content || '';
+                        textarea.dataset.filename = filename;
+                    }
+                    
+                    // Update file tabs
+                    addFileTab(filename);
+                    
+                    // Update status bar
+                    updateStatusBar();
+                    
+                    // Update preview
+                    updatePreview();
+                })
+                .catch(error => console.error('Error opening file:', error));
+        }
+
+        // Add file tab
+        function addFileTab(filename) {
+            if (!openFiles.includes(filename)) {
+                openFiles.push(filename);
+            }
+            renderTabs();
+        }
+
+        // Render file tabs
+        function renderTabs() {
+            const tabsContainer = document.getElementById('editor-tabs');
+            if (!tabsContainer) return;
+            
+            tabsContainer.innerHTML = '';
+            openFiles.forEach(file => {
+                const tab = document.createElement('div');
+                tab.className = 'tab' + (file === currentFile ? ' active' : '');
+                tab.dataset.file = file;
+                tab.onclick = () => openFile(file);
+                
+                const icon = getFileIcon(file);
+                tab.innerHTML = '<span>' + icon + ' ' + file + '</span><span class="tab-close" onclick="event.stopPropagation(); closeTab(\'' + file + '\')">&times;</span>';
+                tabsContainer.appendChild(tab);
+            });
+        }
+
+        // Close tab
+        function closeTab(filename) {
+            openFiles = openFiles.filter(f => f !== filename);
+            if (currentFile === filename) {
+                if (openFiles.length > 0) {
+                    openFile(openFiles[openFiles.length - 1]);
+                } else {
+                    currentFile = null;
+                    const textarea = document.getElementById('editor-textarea');
+                    if (textarea) textarea.value = '';
+                }
+            }
+            renderTabs();
+        }
+
+        // Save current file
+        function saveFile() {
+            if (!currentFile) return;
+            
+            const textarea = document.getElementById('editor-textarea');
+            const content = textarea ? textarea.value : '';
+            
+            fetch('/api/files/' + currentProject + '/' + currentFile, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: content })
+            })
+            .then(response => response.json())
+            .then(data => {
+                isModified = false;
+                showNotification('File saved successfully!');
+            })
+            .catch(error => console.error('Error saving file:', error));
+        }
+
+        // Update preview
+        function updatePreview() {
+            const textarea = document.getElementById('editor-textarea');
+            const content = textarea ? textarea.value : '';
+            
+            const previewFrame = document.getElementById('preview-frame');
+            if (previewFrame) {
+                const doc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+                doc.open();
+                doc.write(content);
+                doc.close();
+            }
+        }
+
+        // Update status bar
+        function updateStatusBar() {
+            const textarea = document.getElementById('editor-textarea');
+            if (!textarea) return;
+            
+            const content = textarea.value;
+            const lines = content.split('\n').length;
+            const cursorPos = textarea.selectionStart;
+            const textBefore = content.substring(0, cursorPos);
+            const line = textBefore.split('\n').length;
+            const col = cursorPos - textBefore.lastIndexOf('\n') - 1;
+            
+            // Update status elements if they exist
+            const fileTypeEl = document.getElementById('current-file-type');
+            if (fileTypeEl && currentFile) {
+                const ext = currentFile.split('.').pop().toUpperCase();
+                fileTypeEl.textContent = ext;
+            }
+            
+            // Log for debugging
+            console.log('Line: ' + line + ', Col: ' + col + ', Lines: ' + lines);
+        }
+
+        // Show notification
+        function showNotification(message) {
+            const existing = document.querySelector('.notification');
+            if (existing) existing.remove();
+            
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        // ===== Enhanced Functions for Mobile =====
         (function() {
             const sidebar = document.getElementById('main-sidebar');
             const overlay = document.getElementById('sidebar-overlay');
@@ -609,6 +794,30 @@
             document.body.appendChild(notification);
             setTimeout(() => notification.remove(), 3000);
         }
+
+        // ===== Initialize =====
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Editor initializing...');
+            loadFiles('default'); // Load default project files
+            
+            // Set up event listeners
+            const textarea = document.getElementById('editor-textarea');
+            if (textarea) {
+                textarea.addEventListener('input', function() {
+                    isModified = true;
+                    updateStatusBar();
+                    updatePreview();
+                });
+            }
+            
+            // Auto-save on Ctrl+S
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 's') {
+                    e.preventDefault();
+                    saveFile();
+                }
+            });
+        });
     </script>
 <!-- New File Modal -->
         <div id="new-file-modal" class="modal hidden">
