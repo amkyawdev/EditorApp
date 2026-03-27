@@ -7,6 +7,499 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/transforms.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='assets/icons/favicon.ico') }}" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 3rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00d4ff 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo span {
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem;
+        }
+
+        /* Header */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .main-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #a5a5a5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* Search Box */
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding: 0.8rem 1.5rem;
+            padding-left: 3rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            color: #fff;
+            font-size: 0.95rem;
+            width: 280px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #00d4ff;
+            width: 320px;
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 0.8rem 1.8rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff 0%, #6366f1 100%);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 212, 255, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-danger {
+            background: rgba(255, 68, 102, 0.2);
+            color: #ff4466;
+            border: 1px solid rgba(255, 68, 102, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 68, 102, 0.3);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        /* Projects Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Project Card */
+        .project-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #00d4ff, #6366f1);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .project-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .project-card .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .project-card h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .project-card .project-meta {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .project-card .project-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .project-card .card-actions {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+        }
+
+        .project-card .card-actions .btn {
+            flex: 1;
+            justify-content: center;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .empty-state .icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .empty-state p {
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .loading-spinner::after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-content .close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 1.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .modal-content .close:hover {
+            background: rgba(255, 68, 102, 0.2);
+            color: #ff4466;
+        }
+
+        .modal-content h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff 0%, #a5a5a5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.8rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .modal-content .btn {
+            width: 100%;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        /* Delete Modal */
+        .delete-modal .modal-content {
+            text-align: center;
+        }
+
+        .delete-modal .warning-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .delete-modal p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+        }
+
+        .delete-modal .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem 1.5rem;
+            }
+
+            .container {
+                padding: 1.5rem;
+            }
+
+            .main-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-actions {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .search-box input {
+                width: 100%;
+            }
+
+            .search-box input:focus {
+                width: 100%;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -14,17 +507,24 @@
         <ul class="nav-links">
             <li><a href="/main" class="active">Projects</a></li>
             <li><a href="/about">About</a></li>
+            <li><a href="/editing">Editor</a></li>
         </ul>
     </nav>
 
     <main class="container">
         <header class="main-header">
-            <h1>Your Projects</h1>
-            <button id="new-project-btn" class="btn btn-primary">New Project</button>
+            <h1>🚀 Your Projects</h1>
+            <div class="header-actions">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Search projects...">
+                </div>
+                <button id="new-project-btn" class="btn btn-primary">
+                    <span>+</span> New Project
+                </button>
+            </div>
         </header>
 
         <div id="projects-grid" class="projects-grid">
-            <!-- Projects will be loaded here via JS -->
             <div class="loading-spinner">Loading projects...</div>
         </div>
     </main>
@@ -37,88 +537,195 @@
             <form id="new-project-form">
                 <div class="form-group">
                     <label for="project-name">Project Name</label>
-                    <input type="text" id="project-name" name="project-name" placeholder="Enter project name" required>
+                    <input type="text" id="project-name" name="project-name" placeholder="e.g., My Awesome Project" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Create</button>
+                <button type="submit" class="btn btn-primary">✨ Create Project</button>
             </form>
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <!-- Delete Confirm Modal -->
+    <div id="delete-modal" class="modal delete-modal">
+        <div class="modal-content">
+            <div class="warning-icon">⚠️</div>
+            <h2>Delete Project?</h2>
+            <p>Are you sure you want to delete <strong id="delete-project-name"></strong>? This action cannot be undone.</p>
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn btn-danger" id="confirm-delete-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // ===== New Project Functionality =====
-        
-        // Show modal
+        // ===== State =====
+        let allProjects = [];
+        let deleteProjectName = '';
+
+        // ===== Initialize =====
         document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('project-modal');
-            const btn = document.getElementById('new-project-btn');
-            const close = document.querySelector('.close');
-            const form = document.getElementById('new-project-form');
-            
-            if (btn) {
-                btn.onclick = function() {
-                    modal.style.display = 'block';
-                }
-            }
-            
-            if (close) {
-                close.onclick = function() {
-                    modal.style.display = 'none';
-                }
-            }
-            
-            if (window.onclick) {
-                window.onclick = function(event) {
-                    if (event.target == modal) {
-                        modal.style.display = 'none';
-                    }
-                }
-            }
-            
-            if (form) {
-                form.onsubmit = function(e) {
-                    e.preventDefault();
-                    const name = document.getElementById('project-name').value.trim();
-                    
-                    fetch('/api/projects', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name: name })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        modal.style.display = 'none';
-                        loadProjects(); // Reload projects
-                        alert('Project "' + name + '" created!');
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Failed to create project');
-                    });
-                }
-            }
-            
-            // Load projects
             loadProjects();
+            setupEventListeners();
         });
 
-        // Load projects list
+        // ===== Event Listeners =====
+        function setupEventListeners() {
+            const modal = document.getElementById('project-modal');
+            const deleteModal = document.getElementById('delete-modal');
+            const btn = document.getElementById('new-project-btn');
+            const close = document.querySelector('.modal-content .close');
+            const searchInput = document.getElementById('search-input');
+
+            if (btn) {
+                btn.onclick = () => {
+                    document.getElementById('project-name').value = '';
+                    modal.classList.add('show');
+                    setTimeout(() => document.getElementById('project-name').focus(), 300);
+                };
+            }
+
+            if (close) {
+                close.onclick = () => modal.classList.remove('show');
+            }
+
+            window.onclick = (e) => {
+                if (e.target === modal) modal.classList.remove('show');
+                if (e.target === deleteModal) deleteModal.classList.remove('show');
+            };
+
+            if (searchInput) {
+                searchInput.oninput = (e) => filterProjects(e.target.value);
+            }
+
+            const form = document.getElementById('new-project-form');
+            if (form) {
+                form.onsubmit = createNewProject;
+            }
+
+            document.getElementById('confirm-delete-btn').onclick = confirmDelete;
+        }
+
+        // ===== Load Projects =====
         function loadProjects() {
             fetch('/api/projects')
-                .then(response => response.json())
+                .then(res => res.json())
                 .then(projects => {
-                    const grid = document.getElementById('projects-grid');
-                    if (!grid) return;
-                    
-                    grid.innerHTML = '';
-                    projects.forEach(project => {
-                        const card = document.createElement('div');
-                        card.className = 'project-card';
-                        card.innerHTML = '<h3>' + project + '</h3><a href="/editing?project=' + project + '" class="btn">Open</a>';
-                        grid.appendChild(card);
-                    });
+                    allProjects = projects;
+                    renderProjects(projects);
                 })
-                .catch(error => console.error('Error loading projects:', error));
+                .catch(err => {
+                    console.error('Error loading projects:', err);
+                    showEmptyState();
+                });
+        }
+
+        // ===== Render Projects =====
+        function renderProjects(projects) {
+            const grid = document.getElementById('projects-grid');
+            if (!grid) return;
+
+            if (projects.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            grid.innerHTML = projects.map((project, index) => `
+                <div class="project-card" style="animation-delay: ${index * 0.1}s">
+                    <div class="card-icon">📁</div>
+                    <h3>${project}</h3>
+                    <div class="project-meta">
+                        <span>📄 HTML</span>
+                        <span>🎨 CSS</span>
+                        <span>⚡ JS</span>
+                    </div>
+                    <div class="card-actions">
+                        <a href="/editing?project=${project}" class="btn btn-primary btn-sm">Open</a>
+                        <button class="btn btn-danger btn-sm" onclick="showDeleteModal('${project}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ===== Filter Projects =====
+        function filterProjects(searchTerm) {
+            const term = searchTerm.toLowerCase();
+            const filtered = allProjects.filter(p => p.toLowerCase().includes(term));
+            renderProjects(filtered);
+        }
+
+        // ===== Show Empty State =====
+        function showEmptyState() {
+            const grid = document.getElementById('projects-grid');
+            grid.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <div class="icon">📂</div>
+                    <h2>No Projects Yet</h2>
+                    <p>Create your first project to start building amazing things!</p>
+                    <button class="btn btn-primary" onclick="document.getElementById('new-project-btn').click()">
+                        <span>+</span> Create Project
+                    </button>
+                </div>
+            `;
+        }
+
+        // ===== Create New Project =====
+        function createNewProject(e) {
+            e.preventDefault();
+            const name = document.getElementById('project-name').value.trim();
+            if (!name) return;
+
+            fetch('/api/projects', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('project-modal').classList.remove('show');
+                showNotification('Project "' + name + '" created! 🎉');
+                loadProjects();
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                alert('Failed to create project');
+            });
+        }
+
+        // ===== Delete Project =====
+        function showDeleteModal(projectName) {
+            deleteProjectName = projectName;
+            document.getElementById('delete-project-name').textContent = projectName;
+            document.getElementById('delete-modal').classList.add('show');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').classList.remove('show');
+        }
+
+        function confirmDelete() {
+            fetch('/api/projects/' + deleteProjectName, { method: 'DELETE' })
+            .then(res => res.json())
+            .then(data => {
+                closeDeleteModal();
+                showNotification('Project "' + deleteProjectName + '" deleted!');
+                loadProjects();
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                alert('Failed to delete project');
+            });
+        }
+
+        // ===== Notification =====
+        function showNotification(message) {
+            const existing = document.querySelector('.notification');
+            if (existing) existing.remove();
+
+            const notif = document.createElement('div');
+            notif.className = 'notification';
+            notif.textContent = message;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 3000);
         }
     </script>
 </body>
